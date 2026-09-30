@@ -1,0 +1,51 @@
+#!/bin/bash
+
+hc() {
+    herbstclient "$@"
+}
+
+#cleanup
+hc keyunbind --all
+#hc spawn pkill eventd
+#hc spawn pkill j4status
+#systemctl --user stop eventd.service --now
+hc spawn pkill dunst
+hc spawn pkill picom
+
+#autostart
+hc spawn feh --bg-scale $HOME/Pictures/iamroot_cozette.png
+hc spawn dunst
+hc spawn /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+#hc spawn $HOME/.config/polybar/launch.sh
+#hc spawn systemctl --user start eventd.service --now
+#eventdctl nd switch xcb $DISPLAY
+hc spawn xinput set-prop 'TPPS/2 IBM TrackPoint' 'Evdev Wheel Emulation' 1
+hc spawn xinput set-prop 'TPPS/2 IBM TrackPoint' 'Evdev Wheel Emulation Button' 2
+hc spawn xinput set-prop 'TPPS/2 IBM TrackPoint' 'Evdev Wheel Emulation Timeout' 200
+hc spawn xinput set-prop 'TPPS/2 IBM TrackPoint' 'Evdev Wheel Emulation Axes' 6 7 4 5
+#hc spawn xrandr --auto --output eDP1 --mode 1920x1080 --right-of HDMI1
+hc spawn picom --config $HOME/.config/picom.conf
+hc spawn setxkbmap us altgr-intl
+
+##########
+# notify #
+##########
+#$HOME/.config/j4status/daemon.sh &
+#$HOME/.config/j4status/status.sh &
+
+pid_picom=$(pidof picom)
+pid_dunst=$(pidof dunst)
+
+if [ "$pid_picom" ]; then
+	hc spawn notify-send "picom has been (re)started."
+else
+	hc spawn notify-send "picom failed to start." -u critical
+fi
+
+if [ "$pid_dunst" ]; then
+	hc spawn notify-send "dunst has been (re)started."
+else
+	hc spawn notify-send "dunst failed to start." -u critical
+fi
+
+hc spawn notify-send "herbstluft has been (re)started."

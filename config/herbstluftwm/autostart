@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+hc() {
+    herbstclient "$@"
+}
+
+###############
+# reload herb #
+######################
+hc emit_hook reload  #
+sleep 1              #
+######################
+#  chainload confs   #
+######################
+hc spawn $HOME/.config/herbstluftwm/binds
+hc spawn $HOME/.config/herbstluftwm/start
+hc spawn $HOME/.config/herbstluftwm/theme
+
+#########
+# rules #
+#########
+hc unrule -F
+hc rule focus=on # normally focus new clients
+hc rule windowtype~'_NET_WM_WINDOW_TYPE_(DIALOG|UTILITY|SPLASH)' floating=on
+hc rule windowtype='_NET_WM_WINDOW_TYPE_DIALOG' focus=on
+hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
+hc set tree_style '╾│ ├└╼─┐'
+
+# client rules
+hc rule class="Arandr" floating=on
+hc rule class="Bitwarden" tag="" pseudotile=on
+
+#################
+# monitor stuff #
+#################
+hc spawn $HOME/.screenlayout/laptop.sh
+hc unlock
+hc detect_monitors
+
+# Set up multi monitors
+#while [[ $(hc list_monitors | wc -l) -gt 1 ]]; do
+#    hc remove_monitor 1
+#done
+
+# tags
+#NUM_MONS=$(xrandr --current | grep "^\w.* connected" | wc -l)
+#MON_RES=( $(xrandr --current | grep "^\w.* connected" | awk '{print $3}') )
+#MON_NUMS=$( python -c "for i in range(${NUM_MONS}): print(i)" )
+
+#for i in ${MON_NUMS[@]} ; do
+#    echo "${i}"
+#    if [[ $i == '0' ]]; then
+#        hc move_monitor $i ${MON_RES[$i]};
+#    else
+#        hc add_monitor ${MON_RES[$i]};
+#    fi
+#done

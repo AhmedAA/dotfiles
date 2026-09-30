@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+ID=$(xdotool getactivewindow)
+XAXIS=$(xwininfo -id $ID | grep "Absolute upper-left X" | sed 's/.*: \([0-9]*\)/\1/g')
+YAXIS=$(xwininfo -id $ID | grep "Absolute upper-left Y" | sed 's/.*: \([0-9]*\)/\1/g')
+
+[ $1 = "right" ] && xdotool windowmove $ID $((XAXIS+10)) $YAXIS 
+[ $1 = "left" ]  && xdotool windowmove $ID $((XAXIS-10)) $YAXIS 
+[ $1 = "down" ]  && xdotool windowmove $ID $XAXIS $((YAXIS+10)) 
+[ $1 = "up" ]    && xdotool windowmove $ID $XAXIS $((YAXIS-10)) 

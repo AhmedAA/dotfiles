@@ -1,0 +1,70 @@
+#!/bin/bash
+
+hc() {
+    herbstclient "$@"
+}
+
+###########
+# colours #
+###########
+###########
+# gruvbox #
+###########
+# https://github.com/morhetz/gruvbox-contrib/blob/master/color.table
+window_border_inactive="#32302f"
+window_border_active="#98971a"
+frame_border_inactive="#1d2021"
+frame_border_active="#fe8019"
+frame_background_active="#af3a03"
+frame_background_inactive="#1d2021"
+
+########
+# gaps #
+########
+hc set window_gap 2
+hc set frame_gap 3
+hc set mouse_recenter_gap 0
+hc set focus_follows_mouse 0
+hc set frame_padding -2
+hc set smart_window_surroundings off
+hc set smart_frame_surroundings off
+hc pad 5 5 5 5 5
+
+#################
+# frame theming #
+#################
+hc attr theme.tiling.reset 1
+hc attr theme.floating.reset 1
+
+#frame colors
+hc set frame_border_active_color $frame_border_active
+hc set frame_border_normal_color $frame_border_inactive
+hc set frame_bg_normal_color $frame_background_inactive
+hc set frame_bg_active_color $frame_background_active
+
+#frame borders
+hc set frame_border_width 2
+hc set always_show_frame off
+hc set frame_active_opacity 0
+hc set frame_normal_opacity 0
+hc set frame_transparent_width 0
+
+##################
+# window theming #
+##################
+hc attr theme.active.color $window_border_active
+hc attr theme.normal.color $window_border_inactive
+# hc attr theme.active.inner_color $color07
+# hc attr theme.active.outer_color $color01
+hc attr theme.active.border_width 2
+hc attr theme.padding_top "5"
+hc attr theme.urgent.color "#fb4934"
+hc attr theme.normal.inner_color $color00
+hc attr theme.normal.inner_width 0
+hc attr theme.normal.border_width 2
+hc attr theme.floating.outer_color $window_border_inactive
+hc attr theme.floating.active.outer_color $window_border_active
+hc attr theme.floating.border_width 2
+hc attr theme.floating.outer_width 0
+hc attr theme.background_color $window_border_inactive
+#hc attr settings.window_radius 15

@@ -1,0 +1,197 @@
+#!/bin/bash
+
+hc() {
+    herbstclient "$@"
+}
+sleep 1
+
+# remove all existing keybindings
+hc keyunbind --all
+
+##############
+# set modkey #
+##############
+Mod=Mod4
+
+################################
+# programs and script triggers #
+################################
+#status things
+hc keybind $Mod-q spawn $HOME/.config/dunst/status/info.sh
+#hc keybind Mod1-space spawn eventdctl nd dismiss oldest default
+hc keybind Mod1-space        spawn dunstctl close
+hc keybind Mod1-Shift-space  spawn dunstctl close-all
+hc keybind Mod1-grave        spawn dunstctl history-pop
+hc keybind Mod1-Shift-period spawn dunstctl context
+
+#volume
+### WITHOUT SCRIPTS ###
+#hc keybind XF86AudioRaiseVolume spawn pactl set-sink-volume @DEFAULT_SINK@ +5%
+#hc keybind XF86AudioLowerVolume spawn pactl set-sink-volume @DEFAULT_SINK@ -5%
+#hc keybind XF86AudioMute        spawn pactl set-sink-mute @DEFAULT_SINK@ toggle
+#hc keybind XF86AudioMicMute     spawn pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+### WITH SCRIPTS ###
+hc keybind XF86AudioRaiseVolume spawn $HOME/.config/dunst/status/volume.sh up
+hc keybind XF86AudioLowerVolume spawn $HOME/.config/dunst/status/volume.sh down
+hc keybind XF86AudioMute        spawn $HOME/.config/dunst/status/volume.sh mute
+
+#brightness
+### WITHOUT SCRIPTS ###
+#hc keybind XF86MonBrightnessDown spawn light -U 10
+#hc keybind XF86MonBrightnessUp   spawn light -A 10
+
+### WITH SCRIPTS ###
+hc keybind XF86MonBrightnessDown spawn $HOME/.config/dunst/status/brightness.sh down
+hc keybind XF86MonBrightnessUp   spawn $HOME/.config/dunst/status/brightness.sh up
+
+#media
+hc keybind $Mod-Mod1-space spawn playerctl play-pause
+hc keybind $Mod-Mod1-n spawn playerctl next
+hc keybind $Mod-Mod1-p spawn playerctl previous
+
+# media controls with media keys
+# hc keybind XF86AudioPlay spawn playerctl play-pause
+# hc keybind XF86AudioNext spawn playerctl next
+# hc keybind XF86AudioPrev spawn playerctl previous
+
+#rofi
+hc keybind $Mod-r spawn $HOME/.config/rofi/launchers/launcher.sh
+hc keybind $Mod-w spawn $HOME/.config/rofi/launchers/windows.sh
+
+#screenshots
+hc keybind Print spawn flameshot gui
+
+#power control
+hc keybind $Mod-Escape spawn $HOME/.config/rofi/scripts/powermenu.sh
+
+#close window
+hc keybind $Mod-Shift-q close
+hc keybind $Mod-Shift-r reload
+
+#spawn terminal
+hc keybind $Mod-Return spawn termite
+
+############
+# wm binds #
+############
+
+##################
+# basic movement #
+##################
+# focusing clients
+hc keybind $Mod-h     focus left
+hc keybind $Mod-j     focus down
+hc keybind $Mod-k     focus up
+hc keybind $Mod-l     focus right
+
+# moving clients
+hc keybind $Mod-Shift-h     shift left
+hc keybind $Mod-Shift-j     shift down
+hc keybind $Mod-Shift-k     shift up
+hc keybind $Mod-Shift-l     shift right
+
+# framesplitting
+hc keybind $Mod-u       split   bottom  0.5
+hc keybind $Mod-o       split   right   0.5
+hc keybind $Mod-d remove
+
+# let the current frame explode into subframes
+hc keybind $Mod-Control-space split explode
+
+# resizing frames
+resizestep=0.015
+hc keybind $Mod-Control-h       resize left +$resizestep
+hc keybind $Mod-Control-j       resize down +$resizestep
+hc keybind $Mod-Control-k       resize up +$resizestep
+hc keybind $Mod-Control-l       resize right +$resizestep
+
+# resizing windows
+hc keybind $Mod-Alt-h spawn $HOME/.config/herbstluftwm/scripts/herbsize -x
+hc keybind $Mod-Alt-j spawn $HOME/.config/herbstluftwm/scripts/herbsize +y
+hc keybind $Mod-Alt-k spawn $HOME/.config/herbstluftwm/scripts/herbsize -y
+hc keybind $Mod-Alt-l spawn $HOME/.config/herbstluftwm/scripts/herbsize +x
+
+# moving floating windows
+hc keybind Alt-Control-h spawn $HOME/.config/herbstluftwm/scripts/herbmove left
+hc keybind Alt-Control-j spawn $HOME/.config/herbstluftwm/scripts/herbmove down
+hc keybind Alt-Control-k spawn $HOME/.config/herbstluftwm/scripts/herbmove up
+hc keybind Alt-Control-l spawn $HOME/.config/herbstluftwm/scripts/herbmove right
+
+##############
+# workspaces #
+##############
+tag_names=("" "" "" "" "" "")
+tag_keys=( {1..6} 0 )
+
+hc rename default "${tag_names[0]}" || true
+for i in ${!tag_names[@]} ; do
+    hc add "${tag_names[$i]}"
+    key="${tag_keys[$i]}"
+    if ! [ -z "$key" ] ; then
+        hc keybind "$Mod-$key" use_index "$i" # FIXME && dunstify --appname="status" -u low "${tag_names[$i]}"
+        hc keybind "$Mod-Shift-$key" move_index "$i"
+    fi
+done
+
+# tag layouts
+hc load ${tag_names[0]} '(clients vertical:0)'
+hc load ${tag_names[1]} '(clients max:2)'
+hc load ${tag_names[2]} '(clients max:2)'
+hc load ${tag_names[3]} '(clients max:2)'
+hc load ${tag_names[4]} '(clients max:2)'
+hc load ${tag_names[5]} '(clients max:2)'
+
+# cycle workspaces
+hc keybind $Mod-period use_index +1 --skip-visible
+hc keybind $Mod-comma  use_index -1 --skip-visible
+
+# spawn scratchpad #
+# sys
+hc keybind $Mod-i spawn $HOME/.config/herbstluftwm/scripts/scratchpad.sh 
+hc keybind $Mod-Shift-i move 
+
+# art/random
+hc keybind $Mod-g spawn $HOME/.config/herbstluftwm/scripts/scratchpad.sh 
+hc keybind $Mod-Shift-g move 
+
+##################
+# floating stuff #
+##################
+# i stopped using the hacky floating script.
+# in the winterbreeze branch/release there should come support for single
+# floating windows. add rules down here/config when it comes.
+# source $HOME/.config/herbstluftwm/scripts/floatmon.sh
+
+#################
+# window states #
+#################
+hc keybind $Mod-s floating toggle
+hc keybind $Mod-Shift-f set_attr clients.focus.floating toggle
+hc keybind $Mod-f fullscreen toggle
+hc keybind $Mod-p pseudotile toggle
+hc keybind $Mod-m set_layout max
+hc keybind $Mod-e set_layout horizontal
+# The following cycles through the available layouts within a frame, but skips
+# layouts, if the layout change wouldn't affect the actual window positions.
+# I.e. if there are two windows within a frame, the grid layout is skipped.
+hc keybind $Mod-space                                                           \
+   or , and . compare tags.focus.curframe_wcount = 2                   \
+   . cycle_layout +1 vertical horizontal max vertical grid    \
+   , cycle_layout +1
+
+####################################
+# mouse + monitor + floating binds #
+####################################
+# mouse
+hc mouseunbind --all
+hc mousebind $Mod-Button1 move
+hc mousebind $Mod-Button2 zoom
+hc mousebind $Mod-Button3 resize
+
+# focus
+hc keybind $Mod-BackSpace   cycle_monitor
+hc keybind $Mod-Tab         cycle +1
+hc keybind $Mod-Shift-Tab   cycle -1
+#hc keybind $Mod-c cycle
+#hc keybind $Mod-i jumpto urgent
